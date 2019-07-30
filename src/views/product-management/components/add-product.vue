@@ -4,8 +4,8 @@
     ref="dataForm"
     :rules="rules"
     :model="temp"
-    label-position="left"
-    label-width="70px"
+    label-position="right"
+    label-width="100px"
     style="width: 80%; margin-left:50px;"
   >
     <el-form-item label="商品类型" prop="type">
@@ -144,12 +144,12 @@ export default {
 </script>
 
 <style>
-	.el-form-item__label{
+	/* .el-form-item__label{
 		width:20%!important;
 	}
 	.el-form-item__content{
 		margin-left: 20%!important;
-	}
+	} */
 
 </style>
 

@@ -85,33 +85,33 @@ export const constantRoutes = [
   },
   // 商城
   {
-    path: '/documentation',
+    path: '/mall-management',
     component: Layout,
-    name: 'Documentation',
-    meta: { title: '商城', icon: 'documentation', affix: true },
+    name: 'mall-management',
+    meta: { title: '商城管理', icon: 'documentation', affix: true },
     children: [
       {
-        path: 'export-excel',
-        component: () => import('@/views/shop/complex-table'),
-        name: 'export-excel',
+        path: 'powerpoint',
+        component: () => import('@/views/mall-management/powerpoint'),
+        name: 'powerpoint',
         meta: { title: '首页幻灯片' }
       },
       {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
+        path: 'nxdyigate',
+        component: () => import('@/views/mall-management/nxdyigate'),
+        name: 'nxdyigate',
         meta: { title: '导航图标' }
       },
       {
-        path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
-        name: 'MergeHeader',
+        path: 'advertising-space',
+        component: () => import('@/views/mall-management/advertising-space'),
+        name: 'advertising-space',
         meta: { title: '广告位' }
       },
       {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
+        path: 'parameters',
+        component: () => import('@/views/mall-management/parameters'),
+        name: 'parameters',
         meta: { title: '商品推荐' }
       }
     ]
@@ -134,21 +134,15 @@ export const constantRoutes = [
         meta: { title: '商品列表' }
       },
       {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
-        meta: { title: '仓库' }
-      },
-      {
         path: 'export-merge-header',
         component: () => import('@/views/excel/merge-header'),
         name: 'MergeHeader',
         meta: { title: '回收站' }
       },
       {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
+        path: 'goods-category',
+        component: () => import('@/views/product-management/goods-category'),
+        name: 'goods-category',
         meta: { title: '商品分类' }
       }
     ]

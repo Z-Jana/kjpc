@@ -1,34 +1,15 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-     
-      <el-select v-model="listQuery.importance" placeholder="预定商品" clearable style="width: 150px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select v-model="listQuery.type" placeholder="商品分类" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
-      </el-select>
-      <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select> -->
-      <el-input v-model="listQuery.title" placeholder="商品名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        查询
-      </el-button>
+
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加实物商品
+        添加栏目
       </el-button>
-      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Export
-      </el-button>
-      <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox> -->
+
     </div>
-  
+
     <el-table
       :key="tableKey"
-      v-loading="listLoading"
       :data="list"
       border
       fit
@@ -36,51 +17,43 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="序号" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+        <!-- v-loading="listLoading" -->
+      <el-table-column label="ID" prop="id"  align="center" width="80" :class-name="getSortClass('id')">
+        <!-- sortable="custom" -->
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="商品" min-width="150px">
+      <el-table-column label="栏目名称" min-width="150px">
         <template slot-scope="{row}">
-          <img src="../../assets/images/logo.png" style="width:30px;height:30px"/>
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          
-          <!-- <el-tag>{{ row.type | typeFilter }}</el-tag> -->
+          <span class="link-type" @click="handleUpdate(row)">{{ row.name }}</span>
+          <!-- <img style="width:35px;height:35px" src="../../assets/images/logo.png" /> -->
+          <!-- <el-tag>{{ row.name }}
+          </el-tag> -->
         </template>
       </el-table-column>
-      <el-table-column label="价格" width="110px" align="center">
+      <!-- <el-table-column label="排序" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.pid }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="显示方式" width="150px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="库存" width="110px" align="center">
+      <el-table-column label="商品数" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="销量" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>  
-      <el-table-column label="商品类型" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
+          <el-switch v-model="row.status" />
+          <!-- <el-tag :type="row.status | statusFilter">
             {{ row.status }}
-          </el-tag>
+          </el-tag> -->
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -97,11 +70,42 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-
+    
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-     
-      <addproduct ></addproduct>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
 
+        <el-form-item label="栏目标题" prop="name" >
+          <el-input v-model="temp.name" />
+        </el-form-item>
+        <el-form-item label="分类排序" prop="timestamp">
+          <el-input v-model="temp.pid"  type="number"/>
+        </el-form-item>
+        <el-form-item label="栏目图片">
+          
+        </el-form-item>
+        <el-form-item label="栏目图片链接" prop="link">
+          <el-input v-model="temp.link" />
+        </el-form-item>
+        <el-form-item label="显示方式" prop="link">
+          <!-- <el-input v-model="temp.type" /> -->
+           <el-radio-group v-model="temp.type">
+            <el-radio :label="1">
+              一行1个
+            </el-radio>
+            <el-radio :label="2">
+              一行2个
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="是否显示" class="field-label">
+          <el-switch v-model="temp.status"  />
+        </el-form-item>
+        <el-form-item label="选择商品" class="field-label">
+          <el-button type="primary" @click="productData">
+            商品内容
+          </el-button>
+        </el-form-item>
+      </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           关闭
@@ -112,13 +116,27 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
+    <el-dialog :visible.sync="dialogPvVisible" title="商品明细">
+      <div class="filter-container">
+      <el-select v-model="listQuery.importance" placeholder="商品分类" clearable style="width: 150px" class="filter-item">
+        <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-input v-model="listQuery.title" placeholder="商品名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        查询
+      </el-button>
+      </div>
+      <el-table :data="proData" border fit highlight-current-row style="width: 100%">
+        <el-table-column
+          type="selection"
+          width="55">
+        </el-table-column>
+        <el-table-column prop="name" label="商品" />
+        <el-table-column prop="price" label="商品价格" />
+        <el-table-column prop="num" label="库存" />
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
+        <el-button type="primary" @click="dialogPvVisible = false">保存</el-button>
       </span>
     </el-dialog>
   </div>
@@ -129,31 +147,17 @@ import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import addproduct from './components/add-product'
 
-const calendarTypeOptions = [
-  { key: '1', display_name: '商品分类1' },
-  { key: '2', display_name: '商品分类2' },
-  { key: '3', display_name: '商品分类3' },
-  { key: '4', display_name: '商品分类4' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination,addproduct },
+  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        0: 'success',
+        1: 'info'
       }
       return statusMap[status]
     },
@@ -163,10 +167,9 @@ export default {
   },
   data() {
     return {
-      
-     
       tableKey: 0,
-      list: null,
+      theme:false,
+      list: [{name:"钻石专题",id:1,pid:1,type:1,link:"www.baidu.com",img:"",number:1,status:0},{name:"戒指专题",id:2,pid:2,type:2,link:"www.baidu.com",img:"",number:2,status:0},{name:"银饰专题",id:3,pid:3,type:2,link:"www.baidu.com",img:"",number:2,status:0}],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -177,11 +180,7 @@ export default {
         type: undefined,
         sort: '+id'
       },
-      importanceOptions: ['预定商品', '实物商品', '积分商品'],
-      calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
+
       temp: {
         id: undefined,
         importance: 1,
@@ -198,17 +197,19 @@ export default {
         create: '新增'
       },
       dialogPvVisible: false,
-      pvData: [],
+      proData: [{name:"商品1",num:1,price:10},{name:"商品2",num:10,price:100}],
       rules: {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      statusOptions: ["分类1", "分类2", "分类3"],
+
     }
   },
   created() {
-    this.getList()
+    // this.getList()//默认请求数据
   },
   methods: {
     getList() {
@@ -229,7 +230,7 @@ export default {
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
+        message: '操作成功',
         type: 'success'
       })
       row.status = status
@@ -328,12 +329,7 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
+
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
@@ -364,7 +360,18 @@ export default {
         : sort === `-${key}`
           ? 'descending'
           : ''
+    },
+    // 选择商品
+    productData(){
+      this.dialogPvVisible=true
     }
   }
 }
 </script>
+<style scoped>
+.field-label{
+  vertical-align: middle;
+}
+  
+</style>
+
