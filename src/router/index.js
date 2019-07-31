@@ -39,17 +39,17 @@ import nestedRouter from './modules/nested'
  * all roles can be accessed
  */
 export const constantRoutes = [
-  {
-    path: '/redirect',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: '/redirect/:path*',
-        component: () => import('@/views/redirect/index')
-      }
-    ]
-  },
+  // {
+  //   path: '/redirect',
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: '/redirect/:path*',
+  //       component: () => import('@/views/redirect/index')
+  //     }
+  //   ]
+  // },
   {
     path: '/login',
     component: () => import('@/views/login/index'),
@@ -79,7 +79,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'dashboard', affix: true }
       }
     ]
   },
@@ -118,10 +118,10 @@ export const constantRoutes = [
   },
   // 商品管理
   {
-    path: '/excel',
+    path: '/product-management',
     component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
+    redirect: '/product-management',
+    name: 'product-management',
     meta: {
       title: '商品管理',
       icon: 'excel'
@@ -135,7 +135,7 @@ export const constantRoutes = [
       },
       {
         path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
+        component: () => import('@/views/product-management/product-table'),
         name: 'MergeHeader',
         meta: { title: '回收站' }
       },
@@ -147,170 +147,53 @@ export const constantRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'Documentation', icon: 'documentation', affix: true }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/guide',
-  //   component: Layout,
-  //   redirect: '/guide/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/guide/index'),
-  //       name: 'Guide',
-  //       meta: { title: 'Guide', icon: 'guide', noCache: true }
-  //     }
-  //   ]
-  // },
-//   {
-//     path: '/profile',
-//     component: Layout,
-//     redirect: '/profile/index',
-//     hidden: true,
-//     children: [
-//       {
-//         path: 'index',
-//         component: () => import('@/views/profile/index'),
-//         name: 'Profile',
-//         meta: { title: 'Profile', icon: 'user', noCache: true }
-//       }
-//     ]
-//   }
-// ]
-
-// /**
-//  * asyncRoutes
-//  * the routes that need to be dynamically loaded based on user roles
-//  */
-// export const asyncRoutes = [
-//   {
-//     path: '/permission',
-//     component: Layout,
-//     redirect: '/permission/page',
-//     alwaysShow: true, // will always show the root menu
-//     name: 'Permission',
-//     meta: {
-//       title: 'Permission',
-//       icon: 'lock',
-//       roles: ['admin', 'editor'] // you can set roles in root nav
-//     },
-//     children: [
-//       {
-//         path: 'page',
-//         component: () => import('@/views/permission/page'),
-//         name: 'PagePermission',
-//         meta: {
-//           title: 'Page Permission',
-//           roles: ['admin'] // or you can only set roles in sub nav
-//         }
-//       },
-//       {
-//         path: 'directive',
-//         component: () => import('@/views/permission/directive'),
-//         name: 'DirectivePermission',
-//         meta: {
-//           title: 'Directive Permission'
-//           // if do not set roles, means: this page does not require permission
-//         }
-//       },
-//       {
-//         path: 'role',
-//         component: () => import('@/views/permission/role'),
-//         name: 'RolePermission',
-//         meta: {
-//           title: 'Role Permission',
-//           roles: ['admin']
-//         }
-//       }
-//     ]
-//   },
-
-//   /** when your routing map is too long, you can split it into small modules **/
-//   componentsRouter,
-//   chartsRouter,
-//   nestedRouter,
-//   tableRouter,
-
-//   {
-//     path: '/example',
-//     component: Layout,
-//     redirect: '/example/list',
-//     name: 'Example',
-//     meta: {
-//       title: 'Example',
-//       icon: 'example'
-//     },
-//     children: [
-//       {
-//         path: 'create',
-//         component: () => import('@/views/example/create'),
-//         name: 'CreateArticle',
-//         meta: { title: 'Create Article', icon: 'edit' }
-//       },
-//       {
-//         path: 'edit/:id(\\d+)',
-//         component: () => import('@/views/example/edit'),
-//         name: 'EditArticle',
-//         meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-//         hidden: true
-//       },
-//       {
-//         path: 'list',
-//         component: () => import('@/views/example/list'),
-//         name: 'ArticleList',
-//         meta: { title: 'Article List', icon: 'list' }
-//       }
-//     ]
-//   },
-
-
-
-//   {
-//     path: '/excel',
-//     component: Layout,
-//     redirect: '/excel/export-excel',
-//     name: 'Excel',
-//     meta: {
-//       title: 'Excel',
-//       icon: 'excel'
-//     },
-//     children: [
-//       {
-//         path: 'export-excel',
-//         component: () => import('@/views/excel/export-excel'),
-//         name: 'ExportExcel',
-//         meta: { title: 'Export Excel' }
-//       },
-//       {
-//         path: 'export-selected-excel',
-//         component: () => import('@/views/excel/select-excel'),
-//         name: 'SelectExcel',
-//         meta: { title: 'Export Selected' }
-//       },
-//       {
-//         path: 'export-merge-header',
-//         component: () => import('@/views/excel/merge-header'),
-//         name: 'MergeHeader',
-//         meta: { title: 'Merge Header' }
-//       },
-//       {
-//         path: 'upload-excel',
-//         component: () => import('@/views/excel/upload-excel'),
-//         name: 'UploadExcel',
-//         meta: { title: 'Upload Excel' }
-//       }
-//     ]
-//   },
+  // 会员管理
+  {
+    path: '/member',
+    component: Layout,
+    redirect: '/member',
+    name: 'member',
+    meta: {
+      title: '会员管理',
+      icon: 'excel'
+    },
+    children: [
+      {
+        path: 'membership-details',
+        component: () => import('@/views/member/membership-details'),
+        name: 'membership-details',
+        meta: { title: '会员详情' }
+      }
+    ]
+  },
+  // 订单
+  // 金行
+  // 财务
+  // 设置
+  {
+    path: '/setting',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'setting',
+    meta: {
+      title: '设置',
+      icon: 'excel'
+    },
+    children: [
+      {
+        path: 'mall-setting',
+        component: () => import('@/views/setting/mall-setting'),
+        name: 'mall-setting',
+        meta: { title: '商城设置' }
+      },
+      {
+        path: 'trade-setting',
+        component: () => import('@/views/setting/trade-setting'),
+        name: 'trade-setting',
+        meta: { title: '交易设置' }
+      }
+    ]
+  },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

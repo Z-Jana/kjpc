@@ -71,9 +71,6 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
 
-            <el-form-item class="label-left"  label="幻灯片标题" prop="name" >
-              <el-input v-model="temp.name" />
-            </el-form-item>
         <el-form-item label="分类排序" prop="timestamp">
           <el-input v-model="temp.pid"  type="number"/>
         </el-form-item>

@@ -1,5 +1,4 @@
 <template>
-  <!-- <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible"> -->
   <el-form
     ref="dataForm"
     :rules="rules"
@@ -113,7 +112,6 @@
         <span style="line-height:36px">%</span>
       </el-col>
     </el-row>
-
   </el-form>
 
 </template>
