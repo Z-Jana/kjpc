@@ -7,10 +7,10 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import componentsRouter from './modules/components'
+// import chartsRouter from './modules/charts'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -88,7 +88,7 @@ export const constantRoutes = [
     path: '/mall-management',
     component: Layout,
     name: 'mall-management',
-    meta: { title: '商城管理', icon: 'documentation', affix: true },
+    meta: { title: '商城管理', icon: 'shopping', affix: true },
     children: [
       {
         path: 'powerpoint',
@@ -124,7 +124,7 @@ export const constantRoutes = [
     name: 'product-management',
     meta: {
       title: '商品管理',
-      icon: 'excel'
+      icon: 'documentation'
     },
     children: [
       {
@@ -163,11 +163,35 @@ export const constantRoutes = [
         component: () => import('@/views/member/membership-details'),
         name: 'membership-details',
         meta: { title: '会员详情' }
+      },
+      {
+        path: 'lower-friend',
+        component: () => import('@/views/member/lower-friend'),
+        name: 'lower-friend',
+        meta: { title: '下级好友' }
       }
     ]
   },
-  // 订单
+  // 订单table
   // 金行
+  {
+    path: '/gold-company',
+    component: Layout,
+    redirect: '/gold-company',
+    name: 'gold-company',
+    meta: {
+      title: '金行',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: 'gold-table',
+        component: () => import('@/views/gold-company/gold-table'),
+        name: 'gold-table',
+        meta: { title: '金行' }
+      }
+    ]
+  },
   // 财务
   // 设置
   {
@@ -177,7 +201,7 @@ export const constantRoutes = [
     name: 'setting',
     meta: {
       title: '设置',
-      icon: 'excel'
+      icon: 'component'
     },
     children: [
       {

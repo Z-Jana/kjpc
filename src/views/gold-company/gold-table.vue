@@ -3,7 +3,7 @@
     <div class="filter-container">
 
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加幻灯片
+        添加金行
       </el-button>
 
     </div>
@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="幻灯片名称" min-width="150px">
+      <el-table-column label="金行名称" min-width="150px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.name }}</span>
           <!-- <img style="width:35px;height:35px" src="../../assets/images/logo.png" /> -->
@@ -39,12 +39,16 @@
           <span>{{ scope.row.pid }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="链接" width="150px" align="center">
+      <el-table-column label="联系方式" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.link }}</span>
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      
+      <el-table-column label="地址" min-width="200px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.address }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-switch v-model="row.status" />
@@ -67,38 +71,38 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
     
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 80% ; margin-left:50px;">
-        <el-form-item label="幻灯片标题" prop="title" >
-          <el-input v-model="temp.title" />
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="金行名称" prop="name" >
+          <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="分类排序" prop="timestamp">
-          <el-input v-model="temp.pid"  type="number"/>
+        <el-form-item label="手机号码" prop="phone">
+          <el-input v-model="temp.phone"  type="number"/>
         </el-form-item>
-        <el-form-item label="幻灯片图片">
-          <el-upload 
-              class="upload-demo"
-              action=""
-              :limit="10"
-              :multiple="true"
-              :on-preview="handleImagePreview"
-              :on-exceed="handleFileExceed"
-              :on-change="handleCrwimgChange"
-              :on-remove="handleCrwimgRemove"
-              :file-list="crwImageList"
-              list-type="picture-card"
-              
-              :auto-upload="false">
-              <!-- :disabled="temp.status == 0 ? false: true" -->
-          <!-- <el-button v-show="temp.status == 0" slot="trigger" size="small" type="primary">新增图片</el-button> -->
-          <i class="el-icon-plus"></i>
-          <!-- <el-button v-show="temp.status == 0" style="margin-left: 10px;" size="small" type="success" @click="submitCrwimg">上传图片</el-button> -->
-          <!--div slot="tip" class="el-upload__tip" v-show="temp.status == 0">只能上传 jpg 或 png 文件，且不超过 2 MB</div-->
-      </el-upload>
+        <el-form-item label="金行地址" prop="address" >
+          <el-input v-model="temp.address" />
         </el-form-item>
-        <el-form-item label="幻灯片链接" prop="link">
-          <el-input v-model="temp.link" />
+
+        <el-form-item label="金行图片">
+          <!-- <el-select v-model="temp.img" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+          </el-select> -->
         </el-form-item>
-        
+        <el-form-item label="登录账号" prop="account">
+          <el-input v-model="temp.account" />
+        </el-form-item>
+        <el-form-item label="登录密码" prop="password">
+          <el-input v-model="temp.password" />
+        </el-form-item>
+        <el-form-item label="服务">
+          <el-radio-group v-model="temp.pid">
+            <el-radio :label="0">
+              提货
+            </el-radio>
+            <el-radio :label="1">
+              回购
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="是否显示">
           <el-switch v-model="temp.status"/>
         </el-form-item>
@@ -145,7 +149,7 @@ export default {
     return {
       tableKey: 0,
       theme:false,
-      list: [{name:"幻灯片1",id:1,pid:1,link:"www.baidu.com",img:"",status:0},{name:"幻灯片2",id:2,pid:2,link:"www.baidu.com",img:"",status:0},{name:"幻灯片3",id:3,pid:3,link:"www.baidu.com",img:"",status:0}],
+      list: [{name:"金行1",id:1,pid:1,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0},{name:"金行2",id:2,pid:2,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0},{name:"金行3",id:3,pid:3,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0}],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -175,34 +179,19 @@ export default {
       rules: {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        name: [{ required: true, message: '字段必填', trigger: 'blur' }],
+        phone: [{ required: true, message: '字段必填', trigger: 'blur' }],
+        address: [{ required: true, message: '字段必填', trigger: 'blur' }],
+        account: [{ required: true, message: '字段必填', trigger: 'blur' }],
+        password: [{ required: true, message: '字段必填', trigger: 'blur' }],
       },
-      downloadLoading: false,
-      crwImageList: [],
+      downloadLoading: false
     }
   },
   created() {
     // this.getList()//默认请求数据
   },
   methods: {
-    // 图片上传
-    handleCrwimgChange(file, fileList){
-                this.crwImageList = fileList
-            },
-            handleCrwimgRemove(file, fileList){
-                this.crwImageList = fileList
-            },
-    handleImagePreview(file){
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
-            },
-            handlePdfPreview(file){
-                window.open(file.url);
-            },
-            handleFileExceed(files, fileList) {
-                this.$message.warning(`最大可上传十个文件！`);
-            },
-    // 
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
@@ -332,9 +321,7 @@ export default {
 }
 </script>
 <style scoped>
-.upload-demo{
-  float: left;
-}
+
   
 </style>
 
