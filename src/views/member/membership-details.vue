@@ -67,20 +67,20 @@
           <el-table-column width="150px" align="center" label="账户">
             <template slot-scope="scope">
               <span>余额：{{ scope.row.author }}</span>
-              <br />
+              <br>
               积分：{{ scope.row.author }}
             </template>
           </el-table-column>
           <el-table-column width="150px" align="center" label="交易">
             <template slot-scope="scope">
               <span>订单：{{ scope.row.author }}</span>
-              <br />
+              <br>
               金额：{{ scope.row.author }}
             </template>
           </el-table-column>
           <el-table-column label="实名" class-name="status-col" width="100">
-            <template slot-scope="{row}">
-              <!-- <el-tag :type="row.status | statusFilter">
+            <template>
+              <!-- slot-scope="{row}"<el-tag :type="row.status | statusFilter">
 									{{ row.status }}
               </el-tag>-->
               <i class="el-icon-close iconclose" />
@@ -123,7 +123,7 @@
         />
         <!-- 会员表单组件 -->
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-          <membershipForm></membershipForm>
+          <membershipForm />
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">关闭</el-button>
             <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">提交</el-button>
@@ -132,44 +132,40 @@
       </el-tab-pane>
       <!-- 交易信息 -->
       <el-tab-pane label="交易信息">
-				<!-- 订单信息组件 -->
-				<tradeInfo></tradeInfo>
-			</el-tab-pane>
+        <!-- 订单信息组件 -->
+        <tradeInfo />
+      </el-tab-pane>
       <!-- 账目信息 -->
       <el-tab-pane label="账目信息">
-				<!-- 账目信息组件 -->
-				<accountsInfo></accountsInfo>
-			</el-tab-pane>
+        <!-- 账目信息组件 -->
+        <accountsInfo />
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script>
 import {
   fetchList,
-  fetchPv,
   createArticle,
   updateArticle
-} from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import Pagination from "@/components/Pagination"; // 分页
-import membershipForm from "./components/membership-form";
-import tradeInfo from "./components/trade-info";
-import accountsInfo from "./components/accounts-info.vue";
+} from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import Pagination from '@/components/Pagination' // 分页
+import membershipForm from './components/membership-form'
+import tradeInfo from './components/trade-info'
+import accountsInfo from './components/accounts-info.vue'
 
 export default {
-  components: { Pagination, membershipForm, tradeInfo, accountsInfo},
+  components: { Pagination, membershipForm, tradeInfo, accountsInfo },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger"
-      };
-      return statusMap[status];
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     }
   },
   data() {
@@ -184,51 +180,51 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id"
-			},
-			dialogFormVisible: false,
+        sort: '+id'
+      },
+      dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '新增'
-      },
-    };
+      }
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.items;
-        this.total = response.data.total;
+        this.list = response.data.items
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     // 删除
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success"
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-		resetTemp() {
+    resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
@@ -240,75 +236,75 @@ export default {
       }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       // this.$nextTick(() => {
       //   this.$refs["dataForm"].clearValidate();
       // });
     },
     createData() {
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'vue-element-admin'
           createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
               duration: 2000
-            });
-          });
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       // this.$nextTick(() => {
       //   this.$refs["dataForm"].clearValidate();
       // });
     },
     updateData() {
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v);
-                this.list.splice(index, 1, this.temp);
-                break;
+                const index = this.list.indexOf(v)
+                this.list.splice(index, 1, this.temp)
+                break
               }
             }
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
               duration: 2000
-            });
-          });
+            })
+          })
         }
-      });
+      })
     },
 
     getSortClass: function(key) {
-      const sort = this.listQuery.sort;
+      const sort = this.listQuery.sort
       return sort === `+${key}`
-        ? "ascending"
+        ? 'ascending'
         : sort === `-${key}`
-        ? "descending"
-        : "";
+          ? 'descending'
+          : ''
     }
   }
-};
+}
 </script>
 <style scoped>
 .iconclose {
@@ -320,5 +316,4 @@ export default {
   color: green;
 }
 </style>
-
 

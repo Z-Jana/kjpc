@@ -10,7 +10,6 @@
 
     <el-table
       :key="tableKey"
-  
       :data="list"
       border
       fit
@@ -18,8 +17,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-        <!-- v-loading="listLoading" -->
-      <el-table-column label="ID" prop="id"  align="center" width="80" :class-name="getSortClass('id')">
+      <!-- v-loading="listLoading" -->
+      <el-table-column label="ID" prop="id" align="center" width="80" :class-name="getSortClass('id')">
         <!-- sortable="custom" -->
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -52,7 +51,7 @@
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-switch v-model="row.status" />
-    
+
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -69,16 +68,16 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="金行名称" prop="name" >
+        <el-form-item label="金行名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
         <el-form-item label="手机号码" prop="phone">
-          <el-input v-model="temp.phone"  type="number"/>
+          <el-input v-model="temp.phone" type="number" />
         </el-form-item>
-        <el-form-item label="金行地址" prop="address" >
+        <el-form-item label="金行地址" prop="address">
           <el-input v-model="temp.address" />
         </el-form-item>
 
@@ -104,7 +103,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否显示">
-          <el-switch v-model="temp.status"/>
+          <el-switch v-model="temp.status" />
         </el-form-item>
 
       </el-form>
@@ -117,18 +116,13 @@
         </el-button>
       </div>
     </el-dialog>
-
-  
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-
 export default {
   name: 'ComplexTable',
   components: { Pagination },
@@ -140,16 +134,13 @@ export default {
         1: 'info'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     return {
       tableKey: 0,
-      theme:false,
-      list: [{name:"金行1",id:1,pid:1,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0},{name:"金行2",id:2,pid:2,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0},{name:"金行3",id:3,pid:3,phone:"13245673456",address:"广东省深圳市福田区赛格广场1楼大厅",img:"",status:0}],
+      theme: false,
+      list: [{ name: '金行1', id: 1, pid: 1, phone: '13245673456', address: '广东省深圳市福田区赛格广场1楼大厅', img: '', status: 0 }, { name: '金行2', id: 2, pid: 2, phone: '13245673456', address: '广东省深圳市福田区赛格广场1楼大厅', img: '', status: 0 }, { name: '金行3', id: 3, pid: 3, phone: '13245673456', address: '广东省深圳市福田区赛格广场1楼大厅', img: '', status: 0 }],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -183,7 +174,7 @@ export default {
         phone: [{ required: true, message: '字段必填', trigger: 'blur' }],
         address: [{ required: true, message: '字段必填', trigger: 'blur' }],
         account: [{ required: true, message: '字段必填', trigger: 'blur' }],
-        password: [{ required: true, message: '字段必填', trigger: 'blur' }],
+        password: [{ required: true, message: '字段必填', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -322,6 +313,5 @@ export default {
 </script>
 <style scoped>
 
-  
 </style>
 

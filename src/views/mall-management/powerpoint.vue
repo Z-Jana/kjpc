@@ -10,7 +10,7 @@
 
     <el-table
       :key="tableKey"
-  
+
       :data="list"
       border
       fit
@@ -18,8 +18,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-        <!-- v-loading="listLoading" -->
-      <el-table-column label="ID" prop="id"  align="center" width="80" :class-name="getSortClass('id')">
+      <!-- v-loading="listLoading" -->
+      <el-table-column label="ID" prop="id" align="center" width="80" :class-name="getSortClass('id')">
         <!-- sortable="custom" -->
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -44,11 +44,11 @@
           <span>{{ scope.row.link }}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-switch v-model="row.status" />
-    
+
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -65,42 +65,42 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 80% ; margin-left:50px;">
-        <el-form-item label="幻灯片标题" prop="title" >
+        <el-form-item label="幻灯片标题" prop="title">
           <el-input v-model="temp.title" />
         </el-form-item>
         <el-form-item label="分类排序" prop="timestamp">
-          <el-input v-model="temp.pid"  type="number"/>
+          <el-input v-model="temp.pid" type="number" />
         </el-form-item>
         <el-form-item label="幻灯片图片">
-          <el-upload 
-              class="upload-demo"
-              action=""
-              :limit="10"
-              :multiple="true"
-              :on-preview="handleImagePreview"
-              :on-exceed="handleFileExceed"
-              :on-change="handleCrwimgChange"
-              :on-remove="handleCrwimgRemove"
-              :file-list="crwImageList"
-              list-type="picture-card"
-              
-              :auto-upload="false">
-              <!-- :disabled="temp.status == 0 ? false: true" -->
-          <!-- <el-button v-show="temp.status == 0" slot="trigger" size="small" type="primary">新增图片</el-button> -->
-          <i class="el-icon-plus"></i>
+          <el-upload
+            class="upload-demo"
+            action=""
+            :limit="10"
+            :multiple="true"
+            :on-preview="handleImagePreview"
+            :on-exceed="handleFileExceed"
+            :on-change="handleCrwimgChange"
+            :on-remove="handleCrwimgRemove"
+            :file-list="crwImageList"
+            list-type="picture-card"
+            :auto-upload="false"
+          >
+            <!-- :disabled="temp.status == 0 ? false: true" -->
+            <!-- <el-button v-show="temp.status == 0" slot="trigger" size="small" type="primary">新增图片</el-button> -->
+            <i class="el-icon-plus" />
           <!-- <el-button v-show="temp.status == 0" style="margin-left: 10px;" size="small" type="success" @click="submitCrwimg">上传图片</el-button> -->
           <!--div slot="tip" class="el-upload__tip" v-show="temp.status == 0">只能上传 jpg 或 png 文件，且不超过 2 MB</div-->
-      </el-upload>
+          </el-upload>
         </el-form-item>
         <el-form-item label="幻灯片链接" prop="link">
           <el-input v-model="temp.link" />
         </el-form-item>
-        
+
         <el-form-item label="是否显示">
-          <el-switch v-model="temp.status"/>
+          <el-switch v-model="temp.status" />
         </el-form-item>
 
       </el-form>
@@ -114,16 +114,14 @@
       </div>
     </el-dialog>
 
-  
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
+// import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
 
 export default {
   name: 'ComplexTable',
@@ -136,16 +134,16 @@ export default {
         1: 'info'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
+    // typeFilter(type) {
+    //   return calendarTypeKeyValue[type]
+    // }
   },
   data() {
     return {
       tableKey: 0,
-      theme:false,
-      list: [{name:"幻灯片1",id:1,pid:1,link:"www.baidu.com",img:"",status:0},{name:"幻灯片2",id:2,pid:2,link:"www.baidu.com",img:"",status:0},{name:"幻灯片3",id:3,pid:3,link:"www.baidu.com",img:"",status:0}],
+      theme: false,
+      list: [{ name: '幻灯片1', id: 1, pid: 1, link: 'www.baidu.com', img: '', status: 0 }, { name: '幻灯片2', id: 2, pid: 2, link: 'www.baidu.com', img: '', status: 0 }, { name: '幻灯片3', id: 3, pid: 3, link: 'www.baidu.com', img: '', status: 0 }],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -178,7 +176,7 @@ export default {
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false,
-      crwImageList: [],
+      crwImageList: []
     }
   },
   created() {
@@ -186,23 +184,23 @@ export default {
   },
   methods: {
     // 图片上传
-    handleCrwimgChange(file, fileList){
-                this.crwImageList = fileList
-            },
-            handleCrwimgRemove(file, fileList){
-                this.crwImageList = fileList
-            },
-    handleImagePreview(file){
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
-            },
-            handlePdfPreview(file){
-                window.open(file.url);
-            },
-            handleFileExceed(files, fileList) {
-                this.$message.warning(`最大可上传十个文件！`);
-            },
-    // 
+    handleCrwimgChange(file, fileList) {
+      this.crwImageList = fileList
+    },
+    handleCrwimgRemove(file, fileList) {
+      this.crwImageList = fileList
+    },
+    handleImagePreview(file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handlePdfPreview(file) {
+      window.open(file.url)
+    },
+    handleFileExceed(files, fileList) {
+      this.$message.warning(`最大可上传十个文件！`)
+    },
+    //
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
@@ -335,6 +333,6 @@ export default {
 .upload-demo{
   float: left;
 }
-  
+
 </style>
 

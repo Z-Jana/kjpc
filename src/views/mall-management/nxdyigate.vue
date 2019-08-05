@@ -10,7 +10,6 @@
 
     <el-table
       :key="tableKey"
-  
       :data="list"
       border
       fit
@@ -18,8 +17,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-        <!-- v-loading="listLoading" -->
-      <el-table-column label="ID" prop="id"  align="center" width="80" :class-name="getSortClass('id')">
+      <!-- v-loading="listLoading" -->
+      <el-table-column label="ID" prop="id" align="center" width="80" :class-name="getSortClass('id')">
         <!-- sortable="custom" -->
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -44,7 +43,7 @@
           <span>{{ scope.row.link }}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-switch v-model="row.status" />
@@ -67,15 +66,15 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
 
-            <el-form-item class="label-left"  label="导航图标标题" prop="name" >
-              <el-input v-model="temp.name" />
-            </el-form-item>
+        <el-form-item class="label-left" label="导航图标标题" prop="name">
+          <el-input v-model="temp.name" />
+        </el-form-item>
         <el-form-item label="分类排序" prop="timestamp">
-          <el-input v-model="temp.pid"  type="number"/>
+          <el-input v-model="temp.pid" type="number" />
         </el-form-item>
         <el-form-item label="导航图标图片">
           <!-- <el-select v-model="temp.img" class="filter-item" placeholder="Please select">
@@ -85,7 +84,7 @@
         <el-form-item label="导航图标链接" prop="link">
           <el-input v-model="temp.link" />
         </el-form-item>
-        
+
         <el-form-item label="是否显示">
           <el-switch v-model="temp.status" style="margin-top:8px;" />
         </el-form-item>
@@ -114,11 +113,10 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
 
 export default {
   name: 'ComplexTable',
@@ -131,16 +129,16 @@ export default {
         1: 'info'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
+    // typeFilter(type) {
+    //   return calendarTypeKeyValue[type]
+    // }
   },
   data() {
     return {
       tableKey: 0,
-      theme:false,
-      list: [{name:"导航图标1",id:1,pid:1,link:"www.baidu.com",img:"",status:0},{name:"导航图标2",id:2,pid:2,link:"www.baidu.com",img:"",status:0},{name:"导航图标3",id:3,pid:3,link:"www.baidu.com",img:"",status:0}],
+      theme: false,
+      list: [{ name: '导航图标1', id: 1, pid: 1, link: 'www.baidu.com', img: '', status: 0 }, { name: '导航图标2', id: 2, pid: 2, link: 'www.baidu.com', img: '', status: 0 }, { name: '导航图标3', id: 3, pid: 3, link: 'www.baidu.com', img: '', status: 0 }],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -335,6 +333,5 @@ export default {
 </script>
 <style scoped>
 
-  
 </style>
 
