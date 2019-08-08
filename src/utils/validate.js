@@ -85,3 +85,55 @@ export function isArray(arg) {
   }
   return Array.isArray(arg)
 }
+// 校验正则表达式
+
+const phoneReg = /^1[3|4|5|7|8|9][0-9]\d{8}$/
+
+const validator = {
+  validatePhone: (rule, value, callback) => {
+    if (!value) {
+      return callback(new Error('手机号不能为空'))
+    } else {
+      if (phoneReg.test(value)) {
+        callback()
+      } else {
+        return callback(new Error('请输入正确的手机号'))
+      }
+    }
+  },
+  validateValueNull: (rule, value, callback) => {
+    if (value == '') {
+      callback(new Error('请添加数据'))
+    } else {
+      callback()
+    }
+  },
+  validateNumZero: (rule, value, callback) => {
+    if (isNaN(parseInt(value))) {
+      callback(new Error('请填写数据'))
+    } else {
+      callback()
+    }
+  },
+  validateLengthNull: (rule, value, callback) => {
+    if (value.length == 0) {
+      callback(new Error('请添加数据'))
+    } else {
+      callback()
+    }
+  },
+  validateTimeRange: (rule, value, callback) => {
+    if (value.length != 2) {
+      callback(new Error('请选择开始时间和结束时间'))
+    } else {
+      if (value[0] == '' || value[1] == '') {
+        callback(new Error('请选择开始时间和结束时间'))
+      } else {
+        callback()
+      }
+    }
+  }
+}
+
+export default validator
+

@@ -51,6 +51,19 @@ export const constantRoutes = [
   //   ]
   // },
   {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: '首页', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -70,19 +83,7 @@ export const constantRoutes = [
     component: () => import('@/views/error-page/401'),
     hidden: true
   },
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [
-      {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
-      }
-    ]
-  },
+
   // 商城
   {
     path: '/mall-management',
@@ -172,7 +173,25 @@ export const constantRoutes = [
       }
     ]
   },
-  // 订单table
+  // 订单
+  {
+    path: '/order',
+    component: Layout,
+    redirect: '/order',
+    name: 'order',
+    meta: {
+      title: '金行',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: 'order-table',
+        component: () => import('@/views/order/order-table'),
+        name: 'order-table',
+        meta: { title: '订单列表' }
+      }
+    ]
+  },
   // 金行
   {
     path: '/gold-company',

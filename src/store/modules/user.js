@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import { Userlongin } from '@/api/login'
 
 const state = {
   token: getToken(),
@@ -29,6 +30,42 @@ const mutations = {
 }
 
 const actions = {
+
+  // 用户名登录
+  LoginByUsername({ commit }, userInfo) {
+    // const username = userInfo.username.trim()
+
+    return new Promise((resolve, reject) => {
+      Userlongin(userInfo).then(response => {
+        const data = response.data
+        console.log(data, 11111111111)
+        commit('SET_TOKEN', data.token)
+
+        setToken(response.data.token)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  // 获取用户信息
+  GetUserInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+    // getUserInfo(state.token).then(response => {
+    //   if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
+    //     reject('error')
+    //   }
+      const data = { roles: 'admin', name: 'admin', avatar: 'admin', introduction: 1 }
+      commit('SET_ROLES', data.roles)
+      commit('SET_NAME', data.name)
+      commit('SET_AVATAR', data.avatar)
+      commit('SET_INTRODUCTION', data.introduction)
+      resolve(data)
+    // }).catch(error => {
+    //   reject(error)
+    // })
+    })
+  },
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
@@ -43,7 +80,6 @@ const actions = {
       })
     })
   },
-
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {

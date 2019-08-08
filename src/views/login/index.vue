@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">系统登录</h3>
+        <h3 class="title">Login Form</h3>
       </div>
 
       <el-form-item prop="username">
@@ -45,7 +45,7 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div style="position:relative">
         <div class="tips">
@@ -57,9 +57,9 @@
           <span>Password : any</span>
         </div>
 
-        <!-- <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
+        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           Or connect with
-        </el-button> -->
+        </el-button>
       </div>
     </el-form>
 
@@ -76,6 +76,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
+import { Userlongin } from '@/api/login'
 
 export default {
   name: 'Login',
@@ -98,11 +99,15 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+      },
+      virtualForm: {
+        username: '',
+        password: ''
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -161,21 +166,49 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
+      // this.$refs.loginForm.validate(valid => {
+      //   if (valid) {
+      //     this.loading = true
+      //     this.$store.dispatch('user/login', this.loginForm)
+      //       .then(() => {
+      //         this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+      //         this.loading = false
+      //       })
+      //       .catch(() => {
+      //         this.loading = false
+      //       })
+      //   } else {
+      //     console.log('error submit!!')
+      //     return false
+      //   }
+      // })
+      const _formData = {
+        account: 'admin',
+        password: '123456'
+      }
+      var _this = this
+      Userlongin(_formData).then(res => {
+        // this.loginHandle(res)
+        _this.virtualForm.account = 'admin'
+        _this.virtualForm.password = _formData.password
+        _this.$refs.loginForm.validate(valid => {
+          if (valid) {
+            _this.loading = true
+            _this.$store.dispatch('user/LoginByUsername', _this.virtualForm).then(() => {
+              _this.loading = false
+              _this.$router.push({ path: '/' })
+            }).catch(() => {
+              _this.loading = false
             })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      }).catch(err => {
+        this.loading = false
+        console.log('登录异常', err)
+        // this.$Message.error('系统错误！')
       })
     },
     getOtherQuery(query) {
