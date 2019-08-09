@@ -1,58 +1,45 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加分类
       </el-button>
-
     </div>
-
     <el-table
       :key="tableKey"
-  
+
       :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
+      :tree-props="{children: 'children'}"
       row-key="id"
-      :tree-props="{children: 'children'}">
+      @sort-change="sortChange"
     >
-        <!-- v-loading="listLoading" -->
-      <el-table-column label="ID" prop="id"  align="center" width="80" :class-name="getSortClass('id')">
-        <!-- sortable="custom" -->
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
-      </el-table-column>
+      >
+      <!-- v-loading="listLoading" -->
+      <!-- <el-table-column label="序号" type="index" align="center" width="80" :class-name="getSortClass('id')" /> -->
 
       <el-table-column label="分类名称" min-width="150px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.name }}</span>
-          <!-- <img style="width:35px;height:35px" src="../../assets/images/logo.png" /> -->
-          <!-- <el-tag>{{ row.name }}
-          </el-tag> -->
         </template>
       </el-table-column>
-      <!-- <el-table-column label="排序" width="110px" align="center">
+      <el-table-column label="排序" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.pid }}</span>
+          <span>{{ scope.row.sort_order }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column label="商品数量" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-switch v-model="row.status" />
-          <!-- <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag> -->
+          <el-switch v-model="row.is_show" :active-value="1" :inactive-value="2" disabled />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
@@ -72,19 +59,19 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 400px; margin-left:50px;">
 
-        <el-form-item class="label-left"  label="分类名称" prop="name" >
+        <el-form-item class="label-left" label="分类名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="分类排序" prop="timestamp">
-          <el-input v-model="temp.pid"  type="number"/>
+        <el-form-item label="分类排序" prop="sort_order">
+          <el-input v-model="temp.sort_order" type="number" :min="0" />
         </el-form-item>
-        
+
         <el-form-item label="是否显示">
-          <el-switch v-model="temp.status"/>
+          <el-switch v-model="temp.is_show" active-value="1" inactive-value="2" />
         </el-form-item>
 
       </el-form>
@@ -98,16 +85,15 @@
       </div>
     </el-dialog>
 
-  
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+import waves from '@/directive/waves'
+import { getToken } from '@/utils/auth'
+import Pagination from '@/components/Pagination' // 分页
+import { goodsCategoryPageApi } from '@/api/product'
 
 export default {
   name: 'ComplexTable',
@@ -120,50 +106,44 @@ export default {
         1: 'info'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     return {
       tableKey: 0,
-      theme:false,
-      list: [{name:"分类1",id:1,number:10,pid:1,cat_group:0,status:0},{name:"分类2",id:2,number:100,pid:2,cat_group:0,status:0,children: [{
-              id: 31,
-              number: '20',
-              name: '分类1-1',
-              pid: 31,
-              cat_group:1,
-              status:0
-            }, {
-              id: 32,
-              number: '202',
-              name: '分类1-2',
-              pid: 32,
-              cat_group:1,
-              status:0
-          }]},
-      {name:"分类3",id:3,number:20,pid:3,cat_group:0,status:0}],
+      theme: false,
+      // list: [{ name: '分类1', id: 1, number: 10, pid: 1, cat_group: 0, status: 0 }, { name: '分类2', id: 2, number: 100, pid: 2, cat_group: 0, status: 0, children: [{
+      //   id: 31,
+      //   number: '20',
+      //   name: '分类1-1',
+      //   pid: 31,
+      //   cat_group: 1,
+      //   status: 0
+      // }, {
+      //   id: 32,
+      //   number: '202',
+      //   name: '分类1-2',
+      //   pid: 32,
+      //   cat_group: 1,
+      //   status: 0
+      // }] },
+      // { name: '分类3', id: 3, number: 20, pid: 3, cat_group: 0, status: 0 }],
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
+        sort: '+id',
+        token: getToken()
       },
-
       temp: {
+        token: getToken(),
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        is_show: '1',
+        sort_order: 0,
+        parent_id: 0,
+        name: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -173,24 +153,21 @@ export default {
       },
 
       rules: {
-        name: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        name: [{ required: true, message: '字段不能为空', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
-    // this.getList()//默认请求数据
+    this.getList()// 默认请求数据
   },
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
+      goodsCategoryPageApi.getGoodsCategoryPage(this.listQuery).then(response => {
+        console.log(response.data.data)
+        this.list = response.data.data
+        this.total = 3
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -224,13 +201,12 @@ export default {
     },
     resetTemp() {
       this.temp = {
+        token: getToken(),
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        is_show: '1',
+        sort_order: 0,
+        parent_id: 0,
+        name: ''
       }
     },
     handleCreate() {
@@ -242,49 +218,48 @@ export default {
       })
     },
     // 添加下级分类
-    handleNextCreate(row){
+    handleNextCreate(row) {
       // this.cat_group
-      if(row.cat_group+1>2){
-        console.log("不能超过3级分类")
-        return false;
-      }
+      // if (row.cat_group + 1 > 2) {
+      //   console.log('不能超过3级分类')
+      //   return false
+      // }
       this.resetTemp()
-      this.temp.cat_group=row.cat_group+1
-      this.parent_id=row.id
+      // this.temp.cat_group = row.cat_group + 1
+      this.temp.parent_id = row.id
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
-      console.log(row)
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          // this.temp.author = 'vue-element-admin'
-          // createArticle(this.temp).then(() => {
-           
-            // this.list.unshift(this.temp)
-            for(let i=0;i<this.list.length;i++){
-              if(this.temp.cat_group==2){
-                for(let j=0;j<this.list[i].children.length;j++){
-                  // this.list[i].children.unshift(this.temp)
-                  if(this.list[i].children[j].parent_id>0){
-                    console.log("11111")
-                  }
-                }
-              }
+          console.log(this.temp, 11111111)
+          goodsCategoryPageApi.addUpdateGoodsCategory(this.temp).then((res) => {
+            // // this.list.unshift(this.temp)
+            // for (let i = 0; i < this.list.length; i++) {
+            //   if (this.temp.cat_group == 2) {
+            //     for (let j = 0; j < this.list[i].children.length; j++) {
+            //       // this.list[i].children.unshift(this.temp)
+            //       if (this.list[i].children[j].parent_id > 0) {
+            //         console.log('11111')
+            //       }
+            //     }
+            //   }
+            // }
+            console.log(res)
+            if (res.status === 200) {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '保存成功',
+                type: 'success',
+                duration: 2000
+              })
             }
-             console.log(this.temp,this.list)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '操作成功',
-              type: 'success',
-              duration: 2000
-            })
-          // })
+          })
         }
       })
     },
@@ -303,7 +278,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
+          goodsCategoryPageApi.addUpdateGoodsCategory(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)
@@ -333,29 +308,6 @@ export default {
       this.list.splice(index, 1)
     },
 
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}`
@@ -369,6 +321,5 @@ export default {
 </script>
 <style scoped>
 
-  
 </style>
 

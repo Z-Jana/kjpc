@@ -106,7 +106,7 @@ export default {
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       virtualForm: {
-        username: '',
+        // username: '',
         password: ''
       },
       passwordType: 'password',

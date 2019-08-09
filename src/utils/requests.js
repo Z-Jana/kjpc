@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
+import { getToken } from './auth'
 // import store from '@/store'
-import { getToken } from '@/utils/auth'
+// import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
@@ -18,7 +19,7 @@ service.interceptors.request.use(config => {
   //   config.headers['token'] = getToken() // 让每个请求携带token--['X-Token']为自定义key 请根据实际情况自行修改
   // }
   config.headers = {
-    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'token': getToken()
   }

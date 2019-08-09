@@ -34,11 +34,11 @@ const actions = {
   // 用户名登录
   LoginByUsername({ commit }, userInfo) {
     // const username = userInfo.username.trim()
-
+    console.log(userInfo)
     return new Promise((resolve, reject) => {
       Userlongin(userInfo).then(response => {
         const data = response.data
-        console.log(data, 11111111111)
+        console.log(response, 11111111111)
         commit('SET_TOKEN', data.token)
 
         setToken(response.data.token)

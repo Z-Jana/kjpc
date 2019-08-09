@@ -19,7 +19,7 @@
       @sort-change="sortChange"
     >
       <!-- v-loading="listLoading" -->
-      <el-table-column label="序号" prop="id" type="index" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="序号" type="index" align="center" width="80" :class-name="getSortClass('id')">
         <!-- sortable="custom" -->
         <!-- <template slot-scope="{ row, index }">
           <span>{{ index }}</span>
@@ -85,7 +85,7 @@
             :on-exceed="handleFileExceed"
             :on-change="handleCrwimgChange"
             :on-remove="handleCrwimgRemove"
-            :file-list="crwImageList"
+            :file-list="ImageList"
             list-type="picture-card"
             :auto-upload="false"
           >
@@ -110,7 +110,7 @@
         <el-button @click="dialogFormVisible = false">
           关闭
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" @click="createData()">
           提交
         </el-button>
       </div>
@@ -120,9 +120,10 @@
 </template>
 
 <script>
-import { updateArticle } from '@/api/article'
+// import { updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 // import { parseTime } from '@/utils'
+import { getToken } from '@/utils/auth'
 import axios from 'axios'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { powerpointPageApi } from '@/api/mall'
@@ -150,9 +151,8 @@ export default {
   data() {
     return {
       pathurl: 'http://192.168.1.137:8050/',
-      token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D',
+      token: getToken(),
       tableKey: 0,
-      theme: false,
       // list: [{ name: '幻灯片1', id: 1, pid: 1, link: 'www.baidu.com', img: '', status: 2 }, { name: '幻灯片2', id: 2, pid: 2, link: 'www.baidu.com', img: '', status: 1 }, { name: '幻灯片3', id: 3, pid: 3, link: 'www.baidu.com', img: '', status: 1 }],
       list: [],
       total: 0,
@@ -162,20 +162,20 @@ export default {
         limit: 20,
         importance: undefined,
         title: undefined,
-        type: 3,
+        type: 1,
         sort: '+id',
-        token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D'
+        token: getToken()
       },
 
       temp: {
         adv_id: undefined,
         rank: 0,
         img_url: '',
-        type: 3,
+        type: 1,
         status: '1',
         refresh_url: '',
         // img_url_file: [],
-        token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D'
+        token: getToken()
 
       },
       dialogFormVisible: false,
@@ -187,8 +187,9 @@ export default {
       rules: {
         title: [{ required: true, message: '字段不能为空', trigger: 'blur' }]
       },
-      downloadLoading: false,
-      crwImageList: []
+      dialogVisible: false,
+      dialogImageUrl: '',
+      ImageList: []
     }
   },
   created() {
@@ -202,11 +203,11 @@ export default {
     // 图片上传
     handleCrwimgChange(file, fileList) {
       console.log(file, fileList)
-      this.crwImageList = fileList
+      this.ImageList = fileList
       // this.temp.img_url_file = fileList
     },
     handleCrwimgRemove(file, fileList) {
-      this.crwImageList = fileList
+      this.ImageList = fileList
       // this.temp.img_url_file = fileList
     },
     handleImagePreview(file) {
@@ -248,13 +249,6 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    // handleModifyStatus(row, status) {
-    //   this.$message({
-    //     message: '操作成功',
-    //     type: 'success'
-    //   })
-    //   row.status = status
-    // },
     sortChange(data) {
       const { prop, order } = data
       if (prop === 'id') {
@@ -271,19 +265,20 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        type: 3,
+        adv_id: undefined,
+        type: 1,
         status: '1',
         title: '',
         refresh_url: '',
         rank: 0,
-        // img_url_file: '',
-        token: this.token
-
+        img_url_file: '',
+        token: getToken()
       }
     },
+    // 新增操作
     handleCreate() {
       this.resetTemp()
+      this.ImageList = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -295,8 +290,64 @@ export default {
         if (valid) {
           console.log(this.temp, 11111111)
           const formData = new FormData()
+          formData.append('token', this.temp.token)
+          formData.append('adv_id', this.temp.adv_id)
+          formData.append('type', this.temp.type)
+          formData.append('title', this.temp.title)
+          formData.append('status', this.temp.status)
+          formData.append('refresh_url', this.temp.refresh_url)
+          formData.append('img_url_file', this.ImageList[0].raw)
+
+          // console.log(formData)
+          const config = {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+          axios.post('/api/admin/Advertise/save',
+            formData, config
+          ).then((res) => {
+            console.log(res)
+            if (res.status === 200) {
+              this.dialogFormVisible = false
+              this.getList()
+              this.ImageList = []
+              this.$notify({
+                title: '成功',
+                message: '保存成功',
+                type: 'success',
+                duration: 2000
+              })
+            }
+          }).catch(err => {
+            console.log('异常', err)
+          })
+        }
+      })
+    },
+    // 编辑操作
+    handleUpdate(row) {
+      this.ImageList.length = 0
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.status = row.status.toString()
+      // this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      if (this.temp.img_url !== '') {
+        this.ImageList.push({ 'url': this.pathurl + this.temp.img_url })
+      } else {
+        this.ImageList.length = 0
+      }
+
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const formData = new FormData()
+          formData.append('adv_id', this.temp.adv_id)
           formData.append('type', '3')
-          formData.append('img_url_file', this.crwImageList[0].raw)
+          formData.append('img_url_file', this.ImageList[0].raw)
           formData.append('title', this.temp.title)
           formData.append('status', this.temp.status)
           formData.append('refresh_url', this.temp.refresh_url)
@@ -312,10 +363,10 @@ export default {
             if (res.status === 200) {
               this.dialogFormVisible = false
               this.getList()
-              this.crwImageList = []
+              this.ImageList = []
               this.$notify({
                 title: '成功',
-                message: '创建成功',
+                message: '更新成功',
                 type: 'success',
                 duration: 2000
               })
@@ -326,62 +377,17 @@ export default {
         }
       })
     },
-    // 编辑操作
-    handleUpdate(row) {
-      this.crwImageList.length = 0
-      this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      if (this.temp.img_url != '') {
-        this.crwImageList.push({ 'url': this.pathurl + this.temp.img_url })
-      } else {
-        this.crwImageList.length = 0
-      }
-
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
     // 删除
     handleDelete(row) {
-      // this.temp = Object.assign({}, row) // copy obj
       const obj = {
-
-        ids: row.adv_id,
-        token: this.token
+        'ids': row.adv_id,
+        'token': this.token
       }
       console.log(obj)
       powerpointPageApi.delPowerpoint(obj).then(res => {
-        console.log(res)
-
         this.$notify({
-          title: 'Success',
-          message: 'Delete Successfully',
+          title: '成功',
+          message: '删除成功',
           type: 'success',
           duration: 2000
         })

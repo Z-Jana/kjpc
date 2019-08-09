@@ -1,16 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加导航图标
       </el-button>
-
     </div>
-
     <el-table
       :key="tableKey"
-
       :data="list"
       border
       fit
@@ -18,17 +14,11 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <!-- v-loading="listLoading" -->
-      <el-table-column label="序号" prop="id" type="index" align="center" width="80" :class-name="getSortClass('id')">
-        <!-- sortable="custom" -->
-      </el-table-column>
+      <el-table-column label="序号" type="index" align="center" width="80" :class-name="getSortClass('id')" />
 
       <el-table-column label="导航图标名称" min-width="150px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <!-- <img style="width:35px;height:35px" src="../../assets/images/logo.png" /> -->
-          <!-- <el-tag>{{ row.name }}
-          </el-tag> -->
         </template>
       </el-table-column>
 
@@ -72,7 +62,7 @@
           <el-input v-model="temp.rank" type="number" :min="0" />
         </el-form-item>
         <el-form-item label="导航图标">
-          建议尺寸:100 * 100 , 请将所有首页导航图片尺寸保持一致
+          <div>建议尺寸:100 * 100 , 请将所有首页导航图片尺寸保持一致</div>
           <el-upload
             class="upload-demo"
             action=""
@@ -82,24 +72,22 @@
             :on-exceed="handleFileExceed"
             :on-change="handleCrwimgChange"
             :on-remove="handleCrwimgRemove"
-            :file-list="crwImageList"
+            :file-list="ImageList"
             list-type="picture-card"
             :auto-upload="false"
           >
-            <!-- :disabled="temp.status == 0 ? false: true" -->
-            <!-- <el-button v-show="temp.status == 0" slot="trigger" size="small" type="primary">新增图片</el-button> -->
             <i class="el-icon-plus" />
-          <!-- <el-button v-show="temp.status == 0" style="margin-left: 10px;" size="small" type="success" @click="submitCrwimg">上传图片</el-button> -->
-          <!--div slot="tip" class="el-upload__tip" v-show="temp.status == 0">只能上传 jpg 或 png 文件，且不超过 2 MB</div-->
           </el-upload>
-
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
         </el-form-item>
         <el-form-item label="导航链接" prop="link">
           <el-input v-model="temp.refresh_url" />
         </el-form-item>
 
         <el-form-item label="是否显示">
-          <el-switch v-model="temp.status" :active-value="1" :inactive-value="2" />
+          <el-switch v-model="temp.status" active-value="1" inactive-value="2" />
         </el-form-item>
 
       </el-form>
@@ -107,7 +95,7 @@
         <el-button @click="dialogFormVisible = false">
           关闭
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" @click="createData()">
           提交
         </el-button>
       </div>
@@ -117,31 +105,21 @@
 </template>
 
 <script>
-import { updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
+import { getToken } from '@/utils/auth'
 import axios from 'axios'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import Pagination from '@/components/Pagination' // 分页组件
 import { powerpointPageApi } from '@/api/mall'
 
 export default {
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        0: 'success',
-        1: 'info'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
       pathurl: 'http://192.168.1.137:8050/',
-      token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D',
+      token: getToken(),
       tableKey: 0,
-      theme: false,
       // list: [{ name: '导航图标1', id: 1, pid: 1, link: 'www.baidu.com', img: '', status: 2 }, { name: '导航图标2', id: 2, pid: 2, link: 'www.baidu.com', img: '', status: 1 }, { name: '导航图标3', id: 3, pid: 3, link: 'www.baidu.com', img: '', status: 1 }],
       list: [],
       total: 0,
@@ -153,9 +131,8 @@ export default {
         title: undefined,
         type: 2,
         sort: '+id',
-        token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D'
+        token: getToken()
       },
-
       temp: {
         adv_id: undefined,
         rank: 0,
@@ -164,8 +141,7 @@ export default {
         status: '1',
         refresh_url: '',
         // img_url_file: [],
-        token: '%2Ffzaw2ezV66RdDzjzNCpYpbNeewgcMtOy4%2BKLliH2zPnOT6T0T3ciWGxiIK6wCwNWbkjJaTYWLQ%3D'
-
+        token: getToken()
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -176,8 +152,9 @@ export default {
       rules: {
         title: [{ required: true, message: '字段不能为空', trigger: 'blur' }]
       },
-      downloadLoading: false,
-      crwImageList: []
+      dialogVisible: false,
+      dialogImageUrl: '',
+      ImageList: []
     }
   },
   created() {
@@ -186,29 +163,13 @@ export default {
   mounted() {
   },
   methods: {
-    // 图片上传
-    handleCrwimgChange(file, fileList) {
-      console.log(file, fileList)
-      this.crwImageList = fileList
-    },
-    handleCrwimgRemove(file, fileList) {
-      this.crwImageList = fileList
-    },
-    handleImagePreview(file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
-    },
-    handleFileExceed(files, fileList) {
-      this.$message.warning(`最大可上传一个文件！`)
-    },
     // 获取列表数据
     getList() {
       this.listLoading = true
       powerpointPageApi.getPowerpointPage(this.listQuery).then(response => {
-        console.log(response.data)
+        console.log(response)
         this.list = response.data.data
         this.total = response.data.total
-
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -241,12 +202,14 @@ export default {
         refresh_url: '',
         rank: 0,
         // img_url_file: '',
-        token: this.token
+        token: getToken()
 
       }
     },
+    // 新增操作
     handleCreate() {
       this.resetTemp()
+      this.ImageList = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -258,12 +221,13 @@ export default {
         if (valid) {
           console.log(this.temp, 11111111)
           const formData = new FormData()
+          formData.append('token', this.temp.token)
+          formData.append('adv_id', this.temp.adv_id)
           formData.append('type', this.temp.type)
-          formData.append('img_url_file', this.crwImageList[0].raw)
           formData.append('title', this.temp.title)
           formData.append('status', this.temp.status)
           formData.append('refresh_url', this.temp.refresh_url)
-          formData.append('token', this.token)
+          formData.append('img_url_file', this.ImageList[0].raw)
           // console.log(formData)
           const config = {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -275,10 +239,10 @@ export default {
             if (res.status === 200) {
               this.dialogFormVisible = false
               this.getList()
-              this.crwImageList = []
+              this.ImageList = []
               this.$notify({
                 title: '成功',
-                message: '创建成功',
+                message: '保存成功',
                 type: 'success',
                 duration: 2000
               })
@@ -291,67 +255,52 @@ export default {
     },
     // 编辑操作
     handleUpdate(row) {
-      this.crwImageList.length = 0
+      this.ImageList.length = 0
       this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
+      this.temp.status = row.status.toString()
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      if (this.temp.img_url != '') {
-        this.crwImageList.push({ 'url': this.pathurl + this.temp.img_url })
+      if (this.temp.img_url !== '') {
+        this.ImageList.push({ 'url': this.pathurl + this.temp.img_url })
       } else {
-        this.crwImageList.length = 0
+        this.ImageList.length = 0
       }
 
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
+
     // 删除
     handleDelete(row) {
-      // this.temp = Object.assign({}, row) // copy obj
       const obj = {
-
-        ids: row.adv_id,
-        token: this.token
+        'ids': row.adv_id,
+        'token': this.token
       }
-      console.log(obj)
       powerpointPageApi.delPowerpoint(obj).then(res => {
-        console.log(res)
-
         this.$notify({
-          title: 'Success',
-          message: 'Delete Successfully',
+          title: '成功',
+          message: '删除成功',
           type: 'success',
           duration: 2000
         })
         this.getList()
       })
-      // const index = this.list.indexOf(row)
-      // this.list.splice(index, 1)
+    },
+    // 图片上传
+    handleCrwimgChange(file, fileList) {
+      console.log(file, fileList)
+      this.ImageList = fileList
+    },
+    handleCrwimgRemove(file, fileList) {
+      this.ImageList = fileList
+    },
+    handleImagePreview(file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handleFileExceed(files, fileList) {
+      this.$message.warning(`最大可上传一个文件！`)
     },
     getSortClass: function(key) {
       const sort = this.listQuery.sort
