@@ -12,7 +12,7 @@ export const goodsCategoryPageApi = {
     return request({
       url: `/api/admin/GoodsCategory/index`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -23,7 +23,7 @@ export const goodsCategoryPageApi = {
     return request({
       url: `/api/admin/GoodsCategory/save`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -34,7 +34,47 @@ export const goodsCategoryPageApi = {
     return request({
       url: `/api/admin/GoodsCategory/deleted`,
       method: 'post',
-      params
+      data: params
+    })
+  }
+}
+/**
+  * @description   商品
+  * @Data 2019/8/5
+  * @author
+  */
+export const goodsPageApi = {
+  /**
+  * @description   商品-分页
+  * @Data 2019/8/5
+  */
+  getGoodsPage: (params) => {
+    return request({
+      url: `/api/admin/Goods/index`,
+      method: 'post',
+      data: params
+    })
+  },
+  /**
+  * @description   新增或修改-商品
+  * @Data 2019/8/5
+  */
+  addUpdateGoods: (params) => {
+    return request({
+      url: `/api/admin/Goods/save`,
+      method: 'post',
+      data: params
+    })
+  },
+  /**
+  * @description   删除-商品
+  * @Data 2019/8/5
+  */
+  deleteGoods: (params) => {
+    return request({
+      url: `/api/admin/Goods/deleted`,
+      method: 'post',
+      data: params
     })
   }
 }

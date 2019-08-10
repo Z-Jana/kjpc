@@ -277,23 +277,21 @@ export default {
         'ids': row.adv_id,
         'token': this.token
       }
-      console.log(obj)
       powerpointPageApi.delPowerpoint(obj).then(res => {
-        console.log(res)
-        if (res.status === 200) {
+        if (res.code === 200) {
           this.$notify({
             title: '成功',
             message: '删除成功',
             type: 'success',
             duration: 2000
           })
-          this.getList()
         } else {
           this.$notify.error({
-            title: '成功',
+            title: '失败',
             message: '删除失败'
           })
         }
+        this.getList()
       })
     },
     // 图片上传

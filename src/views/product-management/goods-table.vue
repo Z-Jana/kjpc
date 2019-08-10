@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-     
+
       <el-select v-model="listQuery.importance" placeholder="预定商品" clearable style="width: 150px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
       </el-select>
@@ -18,6 +18,15 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加实物商品
       </el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        仓库中
+      </el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        上架
+      </el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        下架
+      </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
@@ -25,7 +34,7 @@
         reviewer
       </el-checkbox> -->
     </div>
-  
+
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -36,28 +45,26 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="序号" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="scope">
+      <el-table-column label="序号" prop="id" type="index" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+        <!-- <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
-        </template>
+        </template> -->
       </el-table-column>
 
       <el-table-column label="商品" min-width="150px">
         <template slot-scope="{row}">
-          <img src="../../assets/images/logo.png" style="width:30px;height:30px"/>
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          
-          <!-- <el-tag>{{ row.type | typeFilter }}</el-tag> -->
+          <img src="../../assets/images/logo.png" style="width:50px;height:50px;vertical-align: middle;">
+          <span class="link-type" @click="handleUpdate(row)">{{ row.goods_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="价格" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="库存" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.store_count }}</span>
         </template>
       </el-table-column>
       <el-table-column label="销量" width="110px" align="center">
@@ -65,21 +72,22 @@
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>  
       <el-table-column label="商品类型" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <!-- <el-tag :type="scope.row.cat_id | cattypeFilter"> -->
+          <span>{{ scope.row.cat_id | cattypeFilter }}</span>
+          <!-- </el-tag> -->
         </template>
       </el-table-column>
-
+      <!-- <el-table-column label="排序" width="110px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.is_on_sale }}</span>
+        </template>
+      </el-table-column> -->
       <el-table-column label="是否显示" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
+          <el-tag :type="row.is_on_sale | statusFilter">
+            {{ row.is_on_sale | statusFilter }}
           </el-tag>
         </template>
       </el-table-column>
@@ -99,8 +107,8 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-     
-      <addproduct ></addproduct>
+
+      <GoodsItem ref="goodsForm" :temp="temp" />
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -128,8 +136,10 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import addproduct from './components/add-product'
+import Pagination from '@/components/Pagination' // 分页组件
+import GoodsItem from './components/GoodsItem'
+import { getToken } from '@/utils/auth'
+import { goodsPageApi } from '@/api/product'
 
 const calendarTypeOptions = [
   { key: '1', display_name: '商品分类1' },
@@ -138,33 +148,29 @@ const calendarTypeOptions = [
   { key: '4', display_name: '商品分类4' }
 ]
 
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
   name: 'ComplexTable',
-  components: { Pagination,addproduct },
+  components: { Pagination, GoodsItem },
   directives: { waves },
   filters: {
+    cattypeFilter(type) {
+      const cattype = {
+        1: '预定商品',
+        2: '实物商品',
+        3: '积分商品'
+      }
+      return cattype[type]
+    },
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        1: '上架',
+        2: '下架'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     return {
-      
-     
       tableKey: 0,
       list: null,
       total: 0,
@@ -183,13 +189,26 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        token: getToken(),
+        goods_id: undefined,
+        goods_name: '',
+        price: 0,
+        // is_free_shipping: 0,//是否免运费 0 免费 1邮递 2到付
+        shipping_price: '',
+        store_count: 0,
+        cat_id: '',
+        is_on_sale: 1,
+        brand_id: 1, // 品牌,商品类型
+        is_self_sufficiency: 1, // 自提
+        gold_weight: '', // 金重
+        predetermined_day: '', // 周期
+        process_price: 0,
+        damages_price_rate: 0,
+        give_integral_rate: 0,
+        first_integral_rate: 0,
+        is_specs: 0,
+        goods_content: '',
+        goods_img_file: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -203,8 +222,7 @@ export default {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
@@ -213,11 +231,11 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
+      goodsPageApi.getGoodsPage(this.listQuery).then(response => {
+        console.log(response)
+        this.list = response.data.data
         this.total = response.data.total
 
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -250,38 +268,55 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        token: getToken(),
+        goods_id: undefined,
+        goods_name: '',
+        price: 0,
+        // is_free_shipping: 0,//是否免运费 0 免费 1邮递 2到付
+        shipping_price: '',
+        store_count: 0,
+        cat_id: '',
+        is_on_sale: 0,
+        brand_id: 0, // 品牌,商品类型
+        is_self_sufficiency: 0, // 自提
+        gold_weight: '', // 金重
+        predetermined_day: '', // 周期
+        process_price: 0,
+        is_specs: 0
       }
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
+      // this.$refs['dataForm'].validate((valid) => {
+      //   if (valid) {
+      //     this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+      //     this.temp.author = 'vue-element-admin'
+      //     createArticle(this.temp).then(() => {
+      //       this.list.unshift(this.temp)
+      //       this.dialogFormVisible = false
+      //       this.$notify({
+      //         title: 'Success',
+      //         message: 'Created Successfully',
+      //         type: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      //   }
+      // })
+      this.$refs['goodsForm'].goodsConfirm().then(res => {
+        console.log('ok')
+      }).catch(err => {
+        if (err === 'valid') {
+          console.log('valid')
+        } else {
+          console.log('1111')
         }
       })
     },
@@ -290,9 +325,9 @@ export default {
       this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -368,3 +403,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.link-type{
+  /* vertical-align: middle; */
+}
+</style>

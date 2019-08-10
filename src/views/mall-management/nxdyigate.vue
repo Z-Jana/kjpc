@@ -278,13 +278,20 @@ export default {
         'token': this.token
       }
       powerpointPageApi.delPowerpoint(obj).then(res => {
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
-        })
-        this.getList()
+        if (res.code === 200) {
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: '删除失败'
+          })
+        }
+          this.getList()
       })
     },
     // 图片上传

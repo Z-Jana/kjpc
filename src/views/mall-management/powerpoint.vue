@@ -289,26 +289,11 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp, 11111111)
-          const formData = new FormData()
-          formData.append('token', this.temp.token)
-          formData.append('adv_id', this.temp.adv_id)
-          formData.append('type', this.temp.type)
-          formData.append('title', this.temp.title)
-          formData.append('status', this.temp.status)
-          formData.append('refresh_url', this.temp.refresh_url)
-          formData.append('img_url_file', this.ImageList[0].raw)
+          this.temp.img_url_file = this.ImageList[0].raw
 
-          // console.log(formData)
-          const config = {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          }
-          axios.post('/api/admin/Advertise/save',
-            formData, config
-          ).then((res) => {
+          powerpointPageApi.addUpdatePowerpoint(this.temp).then(res => {
             console.log(res)
-            if (res.status === 200) {
-              this.dialogFormVisible = false
-              this.getList()
+            if (res.code === 200) {
               this.ImageList = []
               this.$notify({
                 title: '成功',
@@ -317,6 +302,8 @@ export default {
                 duration: 2000
               })
             }
+            this.dialogFormVisible = false
+            this.getList()
           }).catch(err => {
             console.log('异常', err)
           })
@@ -383,14 +370,20 @@ export default {
         'ids': row.adv_id,
         'token': this.token
       }
-      console.log(obj)
       powerpointPageApi.delPowerpoint(obj).then(res => {
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
-        })
+        if (res.code === 200) {
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: '删除失败'
+          })
+        }
         this.getList()
       })
       // const index = this.list.indexOf(row)

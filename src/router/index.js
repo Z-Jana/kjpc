@@ -129,14 +129,14 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'product-table',
-        component: () => import('@/views/product-management/product-table'),
+        path: 'goods-table',
+        component: () => import('@/views/product-management/goods-table'),
         name: 'product-table',
         meta: { title: '商品列表' }
       },
       {
         path: 'export-merge-header',
-        component: () => import('@/views/product-management/product-table'),
+        component: () => import('@/views/product-management/goods-table'),
         name: 'MergeHeader',
         meta: { title: '回收站' }
       },

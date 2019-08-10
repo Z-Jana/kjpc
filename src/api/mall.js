@@ -14,7 +14,7 @@ export const powerpointPageApi = {
     return request({
       url: `/api/admin/Advertise/index`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -25,7 +25,7 @@ export const powerpointPageApi = {
     return request({
       url: `/api/admin/Advertise/save`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -36,7 +36,7 @@ export const powerpointPageApi = {
     return request({
       url: `/api/admin/Advertise/deleted`,
       method: 'post',
-      params
+      data: params
     })
   }
 
@@ -55,7 +55,7 @@ export const parametersPageApi = {
     return request({
       url: `/api/admin/GoodsColumn/index`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -66,7 +66,7 @@ export const parametersPageApi = {
     return request({
       url: `/api/admin/GoodsColumn/save`,
       method: 'post',
-      params
+      data: params
     })
   },
   /**
@@ -77,7 +77,7 @@ export const parametersPageApi = {
     return request({
       url: `/api/admin/GoodsColumn/deleted`,
       method: 'post',
-      params
+      data: params
     })
   }
 }

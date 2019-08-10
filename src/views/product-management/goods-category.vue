@@ -51,7 +51,7 @@
             编辑
           </el-button>
 
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
+          <el-button size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -177,14 +177,6 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    // 删除
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.status = status
-    },
     sortChange(data) {
       const { prop, order } = data
       if (prop === 'id') {
@@ -209,6 +201,7 @@ export default {
         name: ''
       }
     },
+    // 新增
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -219,6 +212,16 @@ export default {
     },
     // 添加下级分类
     handleNextCreate(row) {
+      // for (let i = 0; i < this.list.length; i++) {
+      //   if (this.temp.cat_group == 2) {
+      //     for (let j = 0; j < this.list[i].children.length; j++) {
+      //       // this.list[i].children.unshift(this.temp)
+      //       if (this.list[i].children[j].parent_id > 0) {
+      //         console.log('11111')
+      //       }
+      //     }
+      //   }
+      // }
       // this.cat_group
       // if (row.cat_group + 1 > 2) {
       //   console.log('不能超过3级分类')
@@ -238,19 +241,8 @@ export default {
         if (valid) {
           console.log(this.temp, 11111111)
           goodsCategoryPageApi.addUpdateGoodsCategory(this.temp).then((res) => {
-            // // this.list.unshift(this.temp)
-            // for (let i = 0; i < this.list.length; i++) {
-            //   if (this.temp.cat_group == 2) {
-            //     for (let j = 0; j < this.list[i].children.length; j++) {
-            //       // this.list[i].children.unshift(this.temp)
-            //       if (this.list[i].children[j].parent_id > 0) {
-            //         console.log('11111')
-            //       }
-            //     }
-            //   }
-            // }
             console.log(res)
-            if (res.status === 200) {
+            if (res.code === 200) {
               this.dialogFormVisible = false
               this.$notify({
                 title: '成功',
@@ -259,6 +251,7 @@ export default {
                 duration: 2000
               })
             }
+            this.getList()
           })
         }
       })
@@ -297,15 +290,28 @@ export default {
         }
       })
     },
+    // 删除
     handleDelete(row) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+      const obj = {
+        'ids': row.id
+      }
+      console.log(obj)
+      goodsCategoryPageApi.deleteGoodsCategory(obj).then(res => {
+        console.log(res)
+        if (res.code === 0) {
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: '删除失败'
+          })
+        }
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
 
     getSortClass: function(key) {
